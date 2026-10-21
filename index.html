@@ -286,20 +286,70 @@ $('#stars').innerHTML='★'.repeat(p)+'<span class="off">'+'★'.repeat(5-p)+'</
 $('#pg').style.width=(p*20)+'%';$('#pgt').textContent=p+' / 5 missions réussies';
 $('#badges').innerHTML=passed.map((x,i)=>x?`<span class="badge">🏅 ${L[i].t.split(' · ')[1]}</span>`:'').join('');
 const T=SS.reduce((a,x)=>a+x.tot,0),O=SS.reduce((a,x)=>a+x.ok,0);$('#end').hidden=p<5;$('#gpct').textContent=O+' réponses justes sur '+T+' ('+(T?Math.round(100*O/T):0)+' %)'}
+
 const ENDPOINT='https://resultatpolenord.lud-tek.workers.dev'; // colle ici l’adresse du Worker (voir worker.js) : les bilans sont alors ajoutés à resultats.txt
-async function sendMail(){const p=$('#fp').value.trim(),n=$('#fn').value.trim(),c=$('#fc').value.trim(),m=$('#mailmsg');
-if(!p||!n||!c){m.textContent='⚠️ Complète ton prénom, ton nom et ta classe.';return}
-const T=SS.reduce((a,x)=>a+x.tot,0),O=SS.reduce((a,x)=>a+x.ok,0),pc=T?Math.round(100*O/T):0,
-ms=L.map((l,i)=>({a:SS[i].a,best:SS[i].best,n:NQ[i],pct:SS[i].tot?Math.round(100*SS[i].ok/SS[i].tot):0}));
-if(ENDPOINT){m.textContent='Envoi en cours…';
-try{const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prenom:p,nom:n,classe:c,pct:pc,ok:O,tot:T,missions:ms})});
-if(!r.ok)throw 0;m.textContent='✅ Bilan envoyé à ton professeur. Bravo !';$('#sendbtn').disabled=true}
-catch(e){m.textContent='❌ L’envoi a échoué. Vérifie ta connexion et réessaie, ou préviens ton professeur.'}return}
-const body=`Bonjour,\n\nÉlève : ${p} ${n}\nClasse : ${c}\nMission Pôle Nord : les changements d’état\n\nRéponses justes (toutes tentatives, réponses verrouillées) : ${O}/${T} = ${pc} %\n\n`+ms.map((x,i)=>`Mission ${i+1} : ${x.a} tentative(s), meilleur score ${x.best}/${x.n}, ${x.pct} % de réponses justes`).join('\n')+'\n',
-sub=`Bilan Mission Pôle Nord : ${p} ${n} (${c}) : ${pc} %`,t=$('#mailtxt');
-t.hidden=false;t.value='À : l.penin@csndnevers.net\nObjet : '+sub+'\n\n'+body;
-m.innerHTML='Ton application mail devrait s’ouvrir. Appuie sur « Envoyer ». Sinon, copie le texte ci-dessous et envoie-le à <b>l.penin@csndnevers.net</b>.';
-//window.open('mailto:l.penin@csndnevers.net?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body),'_blank')
+
+async function sendMail() {
+  const p = $('#fp').value.trim();
+  const n = $('#fn').value.trim();
+  const c = $('#fc').value.trim();
+  const m = $('#mailmsg');
+
+  // --- DEBUG 1 : Vérification des champs récupérés ---
+  console.log("🔍 DEBUG - Champs saisis :", { prenom: p, nom: n, classe: c });
+
+  if (!p || !n || !c) {
+    m.textContent = '⚠️ Complète ton prénom, ton nom et ta classe.';
+    console.warn("⚠️ Arrêt : Champs incomplets.");
+    return;
+  }
+
+  const T = SS.reduce((a, x) => a + x.tot, 0);
+  const O = SS.reduce((a, x) => a + x.ok, 0);
+  const pc = T ? Math.round(100 * O / T) : 0;
+  
+  const ms = L.map((l, i) => ({
+    a: SS[i].a,
+    best: SS[i].best,
+    n: NQ[i],
+    pct: SS[i].tot ? Math.round(100 * SS[i].ok / SS[i].tot) : 0
+  }));
+
+  // --- DEBUG 2 : Vérification des scores globaux et du tableau missions ---
+  console.log("📊 DEBUG - Scores calculés :", { Total: T, Justes: O, Pourcentage: pc });
+  console.log("🚀 DEBUG - Détail des missions (ms) :", ms);
+
+  if (ENDPOINT) {
+    m.textContent = 'Envoi en cours…';
+    
+    const payload = { prenom: p, nom: n, classe: c, pct: pc, ok: O, tot: T, missions: ms };
+    
+    // --- DEBUG 3 : Ce qui va être envoyé au Cloudflare Worker ---
+    console.log("📦 DEBUG - Payload JSON envoyé au Worker :", JSON.stringify(payload, null, 2));
+
+    try {
+      const r = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // --- DEBUG 4 : Statut de la réponse HTTP ---
+      console.log("🌐 DEBUG - Réponse du serveur (fetch status) :", r.status, r.statusText);
+
+      if (!r.ok) throw new Error(`Erreur HTTP: ${r.status}`);
+
+      m.textContent = '✅ Bilan envoyé à ton professeur. Bravo !';
+      $('#sendbtn').disabled = true;
+      console.log("✨ Succès : Bilan bien transmis !");
+
+    } catch (e) {
+      console.error("❌ DEBUG - Erreur lors du fetch :", e);
+      m.textContent = '❌ L’envoi a échoué. Vérifie ta connexion et réessaie, ou préviens ton professeur.';
+    }
+    return;
+  }
+}
 }
 
 /* simulation */
