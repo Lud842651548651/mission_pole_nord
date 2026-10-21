@@ -286,7 +286,7 @@ $('#stars').innerHTML='★'.repeat(p)+'<span class="off">'+'★'.repeat(5-p)+'</
 $('#pg').style.width=(p*20)+'%';$('#pgt').textContent=p+' / 5 missions réussies';
 $('#badges').innerHTML=passed.map((x,i)=>x?`<span class="badge">🏅 ${L[i].t.split(' · ')[1]}</span>`:'').join('');
 const T=SS.reduce((a,x)=>a+x.tot,0),O=SS.reduce((a,x)=>a+x.ok,0);$('#end').hidden=p<5;$('#gpct').textContent=O+' réponses justes sur '+T+' ('+(T?Math.round(100*O/T):0)+' %)'}
-const ENDPOINT=''; // colle ici l’adresse du Worker (voir worker.js) : les bilans sont alors ajoutés à resultats.txt
+const ENDPOINT='https://resultatpolenord.lud-tek.workers.dev'; // colle ici l’adresse du Worker (voir worker.js) : les bilans sont alors ajoutés à resultats.txt
 async function sendMail(){const p=$('#fp').value.trim(),n=$('#fn').value.trim(),c=$('#fc').value.trim(),m=$('#mailmsg');
 if(!p||!n||!c){m.textContent='⚠️ Complète ton prénom, ton nom et ta classe.';return}
 const T=SS.reduce((a,x)=>a+x.tot,0),O=SS.reduce((a,x)=>a+x.ok,0),pc=T?Math.round(100*O/T):0,
@@ -299,7 +299,7 @@ const body=`Bonjour,\n\nÉlève : ${p} ${n}\nClasse : ${c}\nMission Pôle Nord :
 sub=`Bilan Mission Pôle Nord : ${p} ${n} (${c}) : ${pc} %`,t=$('#mailtxt');
 t.hidden=false;t.value='À : l.penin@csndnevers.net\nObjet : '+sub+'\n\n'+body;
 m.innerHTML='Ton application mail devrait s’ouvrir. Appuie sur « Envoyer ». Sinon, copie le texte ci-dessous et envoie-le à <b>l.penin@csndnevers.net</b>.';
-window.open('mailto:l.penin@csndnevers.net?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body),'_blank')}
+//window.open('mailto:l.penin@csndnevers.net?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body),'_blank')}
 
 /* simulation */
 let M=0,P=[],raf;
