@@ -11,7 +11,12 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:820px;margin:0 auto;padding:16px;background-image:"./fond.jpg"}
+main{max-width:820px;margin:0 auto;padding:16px;background-image: url("fond.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;}
 h1{font-size:1.6rem;margin:.2em 0}h2{margin:0 0 .3em;font-size:1.25rem}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0}
 .mut{color:var(--mut)}
