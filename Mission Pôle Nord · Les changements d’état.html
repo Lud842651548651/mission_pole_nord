@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission Pôle Nord · Les changements d’état</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef7fd;--bg2:#bfe0f3;--sn:#8cc4e8;--card:rgba(255,255,255,.93);--tx:#12263a;--mut:#4f6577;--ac:#1c78d4;--ok:#1a8a4a;--ko:#c93a3a;--bd:#c9dcea;--hl:#e3f1fb}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a2e;--bg2:#050d1a;--sn:#dff1ff;--card:rgba(18,36,58,.92);--tx:#e6eef5;--mut:#a3b8c9;--ac:#6cc0ff;--ok:#4cc783;--ko:#ff7b7b;--bd:#294765;--hl:#143050}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:820px;margin:0 auto;padding:16px}
+h1{font-size:1.6rem;margin:.2em 0}h2{margin:0 0 .3em;font-size:1.25rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0}
+.mut{color:var(--mut)}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .4s}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+nav button,.btn{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 12px;cursor:pointer}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+nav button.done::after{content:" ✓"}
+.btn.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.cours{background:var(--hl);border-radius:10px;padding:10px 14px;margin:10px 0}
+.cours h3{margin:.4em 0 .2em;font-size:1.05rem}
+.eq{font-size:1.1rem;text-align:center;background:var(--card);border-radius:8px;padding:6px;margin:6px 0;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid var(--bd);padding:5px 8px;text-align:left}
+.q{border-top:1px solid var(--bd);padding-top:12px;margin-top:12px}
+.o{display:block;width:100%;text-align:left;margin:5px 0}
+.o.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,transparent)}.o.ko{border-color:var(--ko);background:color-mix(in srgb,var(--ko) 15%,transparent)}
+input[type=text]{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);width:140px}
+.fb{margin-top:6px;font-size:.95rem}.fb.ok{color:var(--ok)}.fb.ko{color:var(--ko)}
+details{margin-top:6px}summary{cursor:pointer;color:var(--ac)}
+canvas{width:100%;max-width:420px;height:200px;background:var(--card);border:1px solid var(--bd);border-radius:10px;display:block;margin:8px 0}
+.badge{display:inline-block;background:var(--hl);border-radius:20px;padding:2px 10px;margin:2px;font-size:.9rem}
+body{background:linear-gradient(180deg,var(--bg2),var(--bg) 70%) fixed;min-height:100vh}
+main{position:relative;z-index:1}
+.snow{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.snow i{position:absolute;top:-24px;color:var(--sn);font-style:normal;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(112vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}.hero::before{animation:none}}
+.card{box-shadow:0 4px 18px rgba(10,50,90,.14)}
+.hero{position:relative;overflow:hidden;border:0;color:#fff;background:linear-gradient(120deg,#0b2447,#145a6e 45%,#1fa97a 78%,#7c5cd6)}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 0,rgba(120,255,200,.5),transparent 60%),radial-gradient(ellipse at 85% 10%,rgba(190,120,255,.45),transparent 55%);animation:aur 7s ease-in-out infinite alternate}
+@keyframes aur{to{opacity:.5;transform:translateX(24px)}}
+.hero>*{position:relative}
+.hero .bar{background:rgba(255,255,255,.28)}.hero .bar i{background:#fff}.hero .mut{color:#e3fbff}
+.hero .badge{background:rgba(255,255,255,.22);color:#fff}
+.ice{position:absolute!important;right:14px;bottom:4px;font-size:3.2rem;line-height:1}
+.cours{border-left:4px solid var(--ac)}
+.fig{background:var(--card);border-radius:10px;padding:6px;text-align:center;margin:8px 0}
+svg text{fill:var(--tx);font:13px system-ui,sans-serif}svg text.st{font-weight:700;font-size:16px}
+.lg{font-size:.9rem}
+.stars{font-size:1.9rem;color:#ffd54a;letter-spacing:4px;margin:6px 0;text-shadow:0 0 10px rgba(255,213,74,.5)}.stars .off{color:rgba(255,255,255,.3);text-shadow:none}.stars small{font-size:1rem;color:#fff;letter-spacing:0;text-shadow:none}
+.fr{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:10px 0}.fr label{display:grid;gap:4px}.fr input{width:100%}
+textarea{width:100%;font:13px/1.4 ui-monospace,monospace;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px;margin-top:6px}
+.res{margin-top:14px;padding:12px;border-radius:10px;border:1px solid var(--bd)}.okk{background:color-mix(in srgb,var(--ok) 15%,transparent)}.koo{background:color-mix(in srgb,var(--ko) 12%,transparent)}
+nav button:disabled{opacity:.5;cursor:not-allowed}.o:disabled,.btn:disabled,input:disabled{cursor:default}.o:disabled:not(.ok):not(.ko){opacity:.65}
+</style>
+</head>
+<body>
+<div class="snow" id="snow"></div>
+<main>
+<header class="card hero">
+<h1>❄️ Mission Pôle Nord</h1>
+<p>Tu es stagiaire à la station de recherche <b>Borealis</b>, sur la banquise du pôle Nord, sous les aurores boréales. Chaque jour, une nouvelle mission te demande de mieux comprendre les <b>changements d’état</b>. Avance à ton rythme : lis le cours, puis réponds aux questions. Chaque réponse validée est définitive. Il faut au moins 90 % de bonnes réponses (9 sur 10) pour réussir une mission, débloquer la suivante et gagner une étoile ⭐. Sinon, un nouveau questionnaire te sera proposé.</p>
+<svg viewBox="0 0 600 200" role="img" aria-label="Illustration : la station de recherche Borealis vue de l’extérieur, sur la banquise" style="width:100%;height:auto;border-radius:12px;display:block;margin:10px 0"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050d24"/><stop offset="1" stop-color="#0f4a5e"/></linearGradient><linearGradient id="au" x1="0" x2="1"><stop offset="0" stop-color="#3dffb0" stop-opacity="0"/><stop offset=".4" stop-color="#3dffb0" stop-opacity=".6"/><stop offset=".75" stop-color="#9a6bff" stop-opacity=".5"/><stop offset="1" stop-color="#9a6bff" stop-opacity="0"/></linearGradient></defs><rect width="600" height="200" fill="url(#sk)"/><path d="M0 70Q120 5 260 50T600 25V85Q420 45 280 95T0 105Z" fill="url(#au)"/><g fill="#fff"><circle cx="40" cy="22" r="1.5"/><circle cx="110" cy="45" r="1"/><circle cx="180" cy="15" r="1.5"/><circle cx="410" cy="20" r="1.2"/><circle cx="470" cy="55" r="1"/><circle cx="570" cy="15" r="1.5"/></g><circle cx="525" cy="38" r="14" fill="#f3f7ff"/><path d="M0 150Q150 135 300 148T600 140V200H0Z" fill="#dff1ff"/><path d="M0 172Q200 160 400 173T600 166V200H0Z" fill="#b7d9ee"/><path d="M280 98V62M270 70h20M274 79h12" stroke="#cfe8f5" stroke-width="2" fill="none"/><circle cx="280" cy="60" r="3" fill="#ff5a5a"/><rect x="350" y="138" width="12" height="14" fill="#b8c9d6"/><rect x="200" y="110" width="150" height="42" rx="4" fill="#e0653a"/><path d="M194 110h162l-10-14H204z" fill="#9b3a22"/><g fill="#ffe28a"><rect x="214" y="122" width="22" height="14" rx="2"/><rect x="246" y="122" width="22" height="14" rx="2"/><rect x="278" y="122" width="22" height="14" rx="2"/></g><rect x="318" y="126" width="18" height="26" fill="#6b2a18"/><path d="M360 152a29 29 0 0 1 58 0z" fill="#eaf4fb"/><rect x="380" y="136" width="16" height="10" rx="2" fill="#ffe28a"/></svg>
+<div class="stars" id="stars"></div>
+<div class="bar"><i id="pg"></i></div>
+<p class="mut" id="pgt"></p>
+<div id="badges"></div><div class="ice">🐻‍❄️</div>
+</header>
+<nav id="nav"></nav>
+<div id="lv"></div>
+<section class="card" id="end" hidden><h2>📨 Envoie ton bilan à ton professeur</h2>
+<p>Bravo, tu as réussi les 5 missions ! Remplis les trois champs, puis clique sur le bouton : ton application mail s’ouvre avec le message prêt à envoyer à l.penin@csndnevers.net. Il te reste à appuyer sur « Envoyer ».</p>
+<p><b>Ton résultat :</b> <span id="gpct"></span></p>
+<div class="fr"><label>Prénom<input type="text" id="fp" autocomplete="given-name"></label><label>Nom<input type="text" id="fn" autocomplete="family-name"></label><label>Classe<input type="text" id="fc" placeholder="ex. 2de 4"></label></div>
+<button class="btn p" onclick="sendMail()">📨 Envoyer mon bilan</button>
+<p id="mailmsg" class="mut"></p><textarea id="mailtxt" readonly hidden rows="10"></textarea></section>
+</main>
+
+<script>
+const L=[
+{t:"Mission 1 · Observer",mi:"Jour 1 : tu inventories les phénomènes autour de la station.",
+cours:`<h3>Les 6 changements d’état physique</h3>
+<table><tr><th>Changement</th><th>De → vers</th></tr>
+<tr><td>Fusion</td><td>solide → liquide</td></tr><tr><td>Solidification</td><td>liquide → solide</td></tr>
+<tr><td>Vaporisation</td><td>liquide → gaz</td></tr><tr><td>Liquéfaction</td><td>gaz → liquide</td></tr>
+<tr><td>Sublimation</td><td>solide → gaz</td></tr><tr><td>Condensation (solide)</td><td>gaz → solide</td></tr></table>
+<p>Exemples : glaçon qui fond, linge qui sèche, buée sur un miroir, givre sur une vitre, neige carbonique qui « fume ».</p>
+<p>Un changement d’état est une transformation <b>physique</b> : l’espèce chimique ne change pas (l’eau reste de l’eau).</p>
+<h3>Diagramme des changements d’état</h3>
+<div class="fig"><svg viewBox="0 0 600 260" role="img" aria-label="Les six changements d’état entre solide, liquide et gaz" style="width:100%;height:auto"><defs><marker id="ae" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#e0653a"/></marker><marker id="ax" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2b7be4"/></marker></defs><g style="fill:var(--hl);stroke:var(--ac);stroke-width:2"><rect x="20" y="100" width="110" height="50" rx="12"/><rect x="245" y="100" width="110" height="50" rx="12"/><rect x="470" y="100" width="110" height="50" rx="12"/></g><g text-anchor="middle"><text class="st" x="75" y="131">Solide</text><text class="st" x="300" y="131">Liquide</text><text class="st" x="525" y="131">Gaz</text></g><g fill="none" stroke-width="3"><g stroke="#e0653a" marker-end="url(#ae)"><path d="M135 114H240"/><path d="M360 114H465"/><path d="M75 98Q300 -30 525 98"/></g><g stroke="#2b7be4" marker-end="url(#ax)"><path d="M240 138H135"/><path d="M465 138H360"/><path d="M525 152Q300 280 75 152"/></g></g><g text-anchor="middle"><text x="187" y="104">Fusion</text><text x="187" y="162">Solidification</text><text x="412" y="104">Vaporisation</text><text x="412" y="162">Liquéfaction</text><text x="300" y="20">Sublimation</text><text x="300" y="248">Condensation solide</text></g></svg>
+<div class="lg"><span style="color:#e0653a">■</span> énergie reçue (endothermique) &nbsp; <span style="color:#2b7be4">■</span> énergie cédée (exothermique)</div></div>
+<h3>Courbe de chauffage de l’eau</h3>
+<div class="fig"><svg viewBox="0 0 600 220" role="img" aria-label="Température de l’eau en fonction du temps avec deux paliers" style="width:100%;height:auto"><path d="M50 15V190H585" fill="none" stroke="var(--mut)" stroke-width="1.5"/><g stroke="var(--mut)" stroke-dasharray="4 4" stroke-width="1"><path d="M50 130H150"/><path d="M50 60H330"/></g><polyline points="60,170 150,130 230,130 330,60 470,60 560,28" fill="none" stroke="var(--ac)" stroke-width="3" stroke-linejoin="round"/><text x="8" y="134">0 °C</text><text x="2" y="64">100 °C</text><text x="58" y="12">T</text><text x="545" y="208">temps</text><text x="100" y="172">Solide</text><text x="160" y="148">Fusion</text><text x="290" y="125">Liquide</text><text x="345" y="80">Vaporisation</text><text x="505" y="85">Gaz</text></svg>
+<div class="lg">Pendant un changement d’état, la température reste constante : c’est un <b>palier</b>.</div></div>`},
+
+{t:"Mission 2 · Modéliser",mi:"Jour 2 : au microscope, que font les molécules ?",
+cours:`<h3>Modèle microscopique</h3>
+<table><tr><th>État</th><th>Disposition</th><th>Mouvement</th></tr>
+<tr><td>Solide</td><td>proches, <b>ordonnées</b></td><td>vibrent sur place</td></tr>
+<tr><td>Liquide</td><td>proches, <b>désordonnées</b></td><td>glissent les unes sur les autres</td></tr>
+<tr><td>Gaz</td><td><b>éloignées</b>, désordonnées</td><td>se déplacent librement et vite</td></tr></table>
+<p>Pendant un changement d’état, les molécules ne changent pas : seuls leur <b>organisation</b> et leurs <b>interactions</b> changent.</p>
+<h3>Les interactions entre molécules</h3>
+<p>Les molécules ne sont pas indépendantes : deux molécules voisines s’attirent par de faibles <b>interactions de Van der Waals</b>. Plus les molécules sont proches, plus cette attraction est forte. Elle assure la <b>cohésion</b> du solide et du liquide, et devient négligeable dans un gaz.</p>
+<p>Changer d’état, c’est donc <b>vaincre</b> (fusion, vaporisation) ou <b>rétablir</b> (solidification, liquéfaction) ces interactions : c’est l’origine de l’énergie échangée.</p>
+<p><b>Essaie :</b> clique sur un état, puis affiche ou masque les interactions (traits bleus = attractions).</p>
+<button class="btn" onclick="setM(0)">Solide</button> <button class="btn" onclick="setM(1)">Liquide</button> <button class="btn" onclick="setM(2)">Gaz</button> <label><input type="checkbox" id="vdw" checked> Interactions</label>
+<canvas id="cv" width="420" height="200"></canvas>`},
+
+{t:"Mission 3 · Écrire",mi:"Jour 3 : tu rédiges le carnet de bord avec le langage des chimistes.",
+cours:`<h3>Écriture symbolique</h3>
+<p>On écrit l’espèce avant et après, avec son état : (s) solide, (ℓ) liquide, (g) gaz, (aq) dissous dans l’eau.</p>
+<div class="eq">H<sub>2</sub>O(s) → H<sub>2</sub>O(ℓ) &nbsp; <span class="mut">fusion</span></div>
+<div class="eq">H<sub>2</sub>O(ℓ) → H<sub>2</sub>O(g) &nbsp; <span class="mut">vaporisation</span></div>
+<h3>Fusion ≠ dissolution</h3>
+<p><b>Fusion</b> : un corps pur passe de solide à liquide, il n’y a qu’une seule espèce. <b>Dissolution</b> : un solide se disperse dans un <b>solvant</b> (souvent l’eau), on obtient une solution.</p>
+<div class="eq">NaCl(s) → Na<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) &nbsp; <span class="mut">dissolution</span></div>`},
+
+{t:"Mission 4 · Énergie",mi:"Jour 4 : tu dois savoir si la glace reçoit ou cède de l’énergie.",
+cours:`<h3>Transfert thermique et changement d’état</h3>
+<p>Changer d’état demande ou libère de l’énergie, transférée sous forme de <b>chaleur</b>. Pendant le changement d’état d’un corps pur, la température reste constante (<b>palier</b>).</p>
+<table><tr><th>Transformation</th><th>Transfert</th><th>Terme</th></tr>
+<tr><td>Fusion, vaporisation, sublimation</td><td>le système <b>reçoit</b> de l’énergie</td><td><b>endothermique</b></td></tr>
+<tr><td>Solidification, liquéfaction, condensation solide</td><td>le système <b>cède</b> de l’énergie</td><td><b>exothermique</b></td></tr></table>
+<p><b>Applications :</b> la sueur qui s’évapore refroidit la peau (vaporisation = endothermique), les packs chauffants à l’acétate de sodium chauffent en cristallisant (solidification = exothermique).</p>`},
+
+{t:"Mission 5 · Calculer",mi:"Jour 5 : les calculs de la station. Utilise une calculatrice.",
+cours:`<h3>Énergie de changement d’état</h3>
+<div class="eq">Q = m × L</div>
+<p>Q : énergie transférée (J) · m : masse (kg) · L : énergie massique de changement d’état (J·kg<sup>−1</sup>).</p>
+<p>Pour l’eau : <b>L<sub>fusion</sub> = 334 kJ·kg<sup>−1</sup></b> et <b>L<sub>vaporisation</sub> = 2 260 kJ·kg<sup>−1</sup></b>.</p>
+<p><b>Convention de signe :</b> Q &gt; 0 si le système reçoit de l’énergie (fusion, vaporisation), Q &lt; 0 s’il en cède (solidification, liquéfaction). Pour la transformation inverse, L change de signe : L<sub>solidif</sub> = −L<sub>fusion</sub>.</p>
+<p>Utile pour la mission finale : énergie et puissance, E = P × Δt (E en J, P en W, Δt en s).</p>`}
+];
+/* ===== moteur de questionnaires ===== */
+const $=s=>document.querySelector(s);
+const R=n=>Math.floor(Math.random()*n),A=a=>a[R(a.length)];
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=R(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const fm=n=>String(+n.toPrecision(3)).replace('.',','),nm=t=>String(t).replace('-','−'),cap=s=>s[0].toUpperCase()+s.slice(1);
+const U={},st=L.map(()=>({qs:[],an:[],rd:0}));
+let passed=[];try{passed=JSON.parse(localStorage.getItem('mpn')||'[]')}catch(e){}
+passed=L.map((_,i)=>!!passed[i]);
+function pick(k,pool,n){const u=U[k]||(U[k]=new Set());let f=pool.map((_,i)=>i).filter(i=>!u.has(i));if(f.length<n){u.clear();f=pool.map((_,i)=>i)}const c=sh(f).slice(0,n);c.forEach(i=>u.add(i));return c.map(i=>pool[i]())}
+function mc(q,good,bad,e){const o=sh([good,...bad]);return{q,o,a:o.indexOf(good),e}}
+const NOMS=["Fusion","Solidification","Vaporisation","Liquéfaction","Sublimation","Condensation solide"],ETAT=["Solide","Liquide","Gaz"];
+const DIR={"Fusion":"solide → liquide","Solidification":"liquide → solide","Vaporisation":"liquide → gaz","Liquéfaction":"gaz → liquide","Sublimation":"solide → gaz","Condensation solide":"gaz → solide"};
+
+/* Niveau 1 : 25 situations + 35 questions sur l’éthanol */
+const SIT=[["Un glaçon fond dans ton verre.","Fusion"],["Le linge étendu dehors finit par sécher.","Vaporisation"],["Du givre se forme sur une vitre, sans passer par l’eau liquide.","Condensation solide"],["La neige carbonique disparaît en laissant un gaz.","Sublimation"],["La rosée se dépose le matin sur l’herbe.","Liquéfaction"],["Un lac gèle en hiver.","Solidification"],["De la buée apparaît sur un miroir de salle de bains.","Liquéfaction"],["Le beurre fond dans une poêle.","Fusion"],["L’eau d’une casserole bout.","Vaporisation"],["Les boules de naphtaline disparaissent dans l’armoire.","Sublimation"],["De l’eau placée au congélateur devient de la glace.","Solidification"],["La cire d’une bougie durcit en refroidissant.","Solidification"],["Des gouttelettes d’eau se forment dans un nuage à partir de la vapeur.","Liquéfaction"],["La neige se forme dans l’air très froid directement à partir de la vapeur d’eau.","Condensation solide"],["Le brouillard se forme au petit matin.","Liquéfaction"],["L’alcool s’évapore sur ta main.","Vaporisation"],["Le chocolat fond dans ta main.","Fusion"],["Un métal fondu refroidit et durcit dans un moule.","Solidification"],["Une flaque d’eau s’assèche au soleil.","Vaporisation"],["Des glaçons oubliés dans le congélateur rétrécissent sans jamais fondre.","Sublimation"],["La neige fond au soleil du printemps.","Fusion"],["Le gaz d’une bouteille de camping est stocké sous pression : il devient liquide.","Liquéfaction"],["La banquise se forme en mer à partir de l’eau.","Solidification"],["Le diiode solide chauffé donne une vapeur violette.","Sublimation"],["Des fleurs de givre se forment sur l’herbe par nuit très froide.","Condensation solide"]]
+.map(([t,a])=>()=>mc(t+' Quel changement d’état est-ce ?',a,sh(NOMS.filter(n=>n!==a)).slice(0,3),a+' : '+DIR[a]+'.'));
+const SU=[["eau",0,100],["éthanol",-114,78],["or",1064,2856],["acide éthanoïque pur (l’acide du vinaigre blanc)",17,118],["mercure",-39,357],["plomb",327,1749],["diazote",-210,-196]];
+const ft=T=>nm(Math.abs(T)>=1000?String(T).replace(/(\d)(\d{3})$/,'$1 $2'):T)+' °C';
+function curve(Tf,Te){const r=Te-Tf,lo=Tf-.4*r,hi=Te+.35*r,y=T=>+(190-(T-lo)/(hi-lo)*170).toFixed(1);
+return `<svg viewBox="0 0 600 230" role="img" aria-label="Courbe de chauffage avec deux paliers à ${ft(Tf)} et ${ft(Te)}" style="width:100%;height:auto"><path d="M70 12V200H590" fill="none" stroke="var(--mut)" stroke-width="1.5"/><g stroke="var(--mut)" stroke-dasharray="4 4" fill="none"><path d="M70 ${y(Tf)}H150"/><path d="M70 ${y(Te)}H330"/></g><polyline points="80,190 150,${y(Tf)} 210,${y(Tf)} 330,${y(Te)} 450,${y(Te)} 560,20" fill="none" stroke="var(--ac)" stroke-width="3" stroke-linejoin="round"/><text x="4" y="${y(Tf)+4}">${ft(Tf)}</text><text x="4" y="${y(Te)+4}">${ft(Te)}</text><text x="76" y="10">T</text><text x="520" y="218">temps</text></svg>`}
+function gq([nom,Tf,Te]){const r=Te-Tf,k=r>1000?50:r>300?10:r>100?5:1,rd=x=>Math.round(x/k)*k,N=`<b>${cap(nom)}.</b> `,
+tb=g=>[...new Set([Tf,Te,Math.round((Tf+Te)/2),g+50,g-50,0,100].filter(x=>x!==g))].slice(0,3).map(ft),
+z={Solide:()=>rd(Tf-r*(.1+.25*Math.random())),Liquide:()=>rd(Tf+r*(.12+.76*Math.random())),Gaz:()=>rd(Te+r*(.1+.2*Math.random()))},
+sq=zn=>{const T=z[zn](),a=T<Tf?'Solide':T<Te?'Liquide':'Gaz';return mc(`${N}Sur sa courbe de chauffage, à ${ft(T)}, la substance est…`,a,ETAT.filter(x=>x!==a),`${ft(T)} est ${T<Tf?'inférieur à la température de fusion ('+ft(Tf)+')':T<Te?'compris entre '+ft(Tf)+' et '+ft(Te):'supérieur à la température d’ébullition ('+ft(Te)+')'} : la substance est ${a.toLowerCase()}.`)},
+O=[()=>mc(`${N}Quelle est sa température de fusion ?`,ft(Tf),tb(Tf),'Elle se lit sur le premier palier.'),
+()=>mc(`${N}Quelle est sa température d’ébullition ?`,ft(Te),tb(Te),'Elle se lit sur le second palier.'),
+()=>mc(`${N}Quel changement d’état a lieu au palier à ${ft(Tf)} quand on chauffe ?`,'Fusion',['Solidification','Vaporisation','Sublimation'],'Solide → liquide : fusion.'),
+()=>mc(`${N}Quel changement d’état a lieu au palier à ${ft(Te)} quand on chauffe ?`,'Vaporisation',['Liquéfaction','Fusion','Condensation solide'],'Liquide → gaz : vaporisation (ébullition).'),
+()=>mc(`${N}Que se passe-t-il pendant le palier à ${ft(Te)} ?`,'Liquide et gaz coexistent, la température reste constante',['La substance est entièrement liquide','La substance est entièrement gazeuse','La température augmente régulièrement'],'Pendant un changement d’état d’un corps pur, la température est constante.')];
+return sh([...['Solide','Liquide','Gaz'].map(sq),...sh(O).slice(0,2).map(f=>f())])}
+L[0].gen=()=>{const [s]=pick('su',SU.map(x=>()=>x),1),g=gq(s);g[0].f=curve(s[1],s[2]);return[...pick('sit',SIT,5),...g]};
+
+/* Niveau 2 : modèle microscopique et interactions */
+const PR=[["ses entités sont proches et ordonnées","Solide"],["ses entités sont éloignées les unes des autres","Gaz"],["ses entités sont proches mais désordonnées","Liquide"],["ses entités vibrent sur place","Solide"],["ses entités glissent les unes sur les autres","Liquide"],["ses entités se déplacent librement et rapidement","Gaz"],["il a une forme propre et un volume propre","Solide"],["il a un volume propre mais pas de forme propre","Liquide"],["il n’a ni forme propre ni volume propre","Gaz"],["il est facilement compressible","Gaz"],["les interactions de Van der Waals y sont négligeables","Gaz"],["les interactions y sont fortes et la structure est régulière","Solide"]]
+.map(([p,a])=>()=>mc(`Quel état vérifie : ${p} ?`,a,ETAT.filter(x=>x!==a),`C’est l’état ${a.toLowerCase()}.`));
+const MC=[["la fusion","L’ordre disparaît, les molécules restent proches",1],["la solidification","Les molécules s’organisent de façon ordonnée, toujours proches",0],["la vaporisation","Les molécules s’éloignent et se déplacent librement",1],["la liquéfaction","Les molécules se rapprochent mais restent désordonnées",0],["la sublimation","Les molécules passent d’un état ordonné et serré à un état éloigné et libre",1],["la condensation solide","Les molécules passent d’un état éloigné et libre à un état ordonné et serré",0]];
+const V='vaincues : il faut fournir de l’énergie',W='rétablies : de l’énergie est libérée';
+const P2=[...PR,...MC.map(([n,d])=>()=>mc(`À l’échelle microscopique, lors de ${n}, que se passe-t-il ?`,d,sh(MC.map(x=>x[1]).filter(x=>x!==d)).slice(0,3),'Modèle microscopique de '+n+'.')),
+...MC.map(([n,d,v])=>()=>mc(`Lors de ${n}, les interactions de Van der Waals entre molécules sont…`,v?V:W,[v?W:V,'détruites en même temps que les molécules'],v?'Fusion, vaporisation, sublimation : énergie reçue.':'Solidification, liquéfaction, condensation solide : énergie cédée.')),
+...MC.map(([n])=>()=>mc(`Lors de ${n} de l’eau, la molécule H₂O…`,'reste identique',['se casse en dihydrogène et dioxygène','devient une autre espèce chimique'],'Transformation physique : l’espèce chimique ne change pas.'))];
+L[1].gen=()=>pick('p2',P2,6);
+
+/* Niveau 3 : équations, fusion et dissolution */
+const SB=[["H₂O","de l’eau"],["I₂","du diiode"],["CO₂","du dioxyde de carbone"],["O₂","du dioxygène"],["N₂","du diazote"],["C₂H₆O","de l’éthanol"]],
+CG=[["la fusion","s","ℓ"],["la solidification","ℓ","s"],["la vaporisation","ℓ","g"],["la liquéfaction","g","ℓ"],["la sublimation","s","g"],["la condensation solide","g","s"]],
+PA=[["s","ℓ"],["ℓ","s"],["ℓ","g"],["g","ℓ"],["s","g"],["g","s"]],SE={s:'solide',ℓ:'liquide',g:'gaz'};
+const eq=(f,p)=>`${f}(${p[0]}) → ${f}(${p[1]})`;
+const EQ=SB.flatMap(([f,d])=>CG.map(([c,a,b])=>()=>{const x=[a,b].join(),y=[b,a].join(),o=sh(PA.filter(p=>p.join()!==x&&p.join()!==y)).slice(0,2).map(p=>eq(f,p));return mc(`Quelle équation modélise ${c} ${d} ?`,eq(f,[a,b]),[eq(f,[b,a]),...o],`${cap(c)} : ${SE[a]} → ${SE[b]}, soit ${eq(f,[a,b])}.`)}));
+const FD=[["Du sucre disparaît dans ton thé.","Dissolution"],["Du beurre fond dans une poêle.","Fusion"],["Le sel disparaît dans l’eau de cuisson des pâtes.","Dissolution"],["Un glaçon fond.","Fusion"],["La cire d’une bougie devient liquide près de la flamme.","Fusion"],["Une pastille de café soluble disparaît dans l’eau chaude.","Dissolution"],["Du plomb solide devient liquide à 327 °C.","Fusion"],["Du permanganate de potassium colore l’eau en violet.","Dissolution"],["Du chocolat fond au soleil.","Fusion"],["Du bicarbonate se dissout dans l’eau.","Dissolution"],["Du fer devient liquide dans un haut-fourneau.","Fusion"],["Du sulfate de cuivre colore l’eau en bleu.","Dissolution"]]
+.map(([t,a])=>()=>mc(t+' Fusion ou dissolution ?',a,[a==='Fusion'?'Dissolution':'Fusion'],a==='Fusion'?'Un corps pur passe de solide à liquide sous l’effet de la chaleur, sans solvant : fusion.':'Le solide se disperse dans un solvant : dissolution.'));
+const DS=[["NaCl","Na⁺(aq) + Cl⁻(aq)"],["KCl","K⁺(aq) + Cl⁻(aq)"],["CuSO₄","Cu²⁺(aq) + SO₄²⁻(aq)"],["C₁₂H₂₂O₁₁","C₁₂H₂₂O₁₁(aq)"],["C₆H₁₂O₆","C₆H₁₂O₆(aq)"]]
+.map(([f,r])=>()=>mc(`Quelle équation modélise la dissolution de ${f}(s) dans l’eau ?`,`${f}(s) → ${r}`,[`${f}(s) → ${f}(ℓ)`,`${r} → ${f}(s)`,`${f}(s) → ${f}(g)`],'Dans une dissolution, l’espèce se disperse dans l’eau : elle est notée (aq).'));
+L[2].gen=()=>{const e=pick('eq',EQ,3);return[e[0],e[1],pick('fd',FD,1)[0],e[2],pick('ds',DS,1)[0]]};
+
+/* Niveau 4 : transfert thermique, endothermique, exothermique */
+const C4=[["la fusion",1],["la vaporisation",1],["la sublimation",1],["la solidification",0],["la liquéfaction",0],["la condensation solide",0]],EN='endothermique',EX='exothermique';
+const SC=[["La sueur s’évapore sur ta peau.",1,"La vaporisation prélève de l’énergie à la peau."],["Un glaçon fond dans une boisson.",1,"La fusion prélève de l’énergie à la boisson, qui se refroidit."],["De l’eau se transforme en glace dans le congélateur.",0,"La solidification libère de l’énergie."],["De la buée se forme sur une vitre.",0,"La liquéfaction libère de l’énergie."],["Un pack chauffant à l’acétate de sodium cristallise.",0,"La solidification libère de l’énergie : le pack chauffe."],["Du linge sèche au soleil.",1,"La vaporisation de l’eau demande de l’énergie."],["De l’alcool s’évapore sur ta main et tu sens du froid.",1,"La vaporisation prélève de l’énergie à ta peau."],["De la vapeur d’eau se liquéfie sur ta peau.",0,"La liquéfaction libère beaucoup d’énergie : risque de brûlure."],["La neige carbonique refroidit une boîte en se sublimant.",1,"La sublimation prélève de l’énergie."],["Un lac gèle : l’air voisin se réchauffe un peu.",0,"La solidification libère de l’énergie."],["La cire d’une bougie se solidifie après extinction.",0,"La solidification libère de l’énergie."],["Du beurre fond dans la poêle.",1,"La fusion reçoit de l’énergie."],["La rosée se forme sur l’herbe.",0,"La liquéfaction libère de l’énergie."],["Du givre se forme sur la vitre.",0,"La condensation solide libère de l’énergie."],["De la naphtaline se sublime.",1,"La sublimation reçoit de l’énergie."],["L’eau bout dans une casserole.",1,"La vaporisation reçoit de l’énergie."]];
+const T4=[...C4.map(([n,v])=>()=>mc(`${cap(n)} est une transformation…`,v?EN:EX,[v?EX:EN],v?'Elle reçoit de l’énergie : endothermique.':'Elle cède de l’énergie : exothermique.')),
+...C4.map(([n,v])=>()=>mc(`Lors de ${n}, le transfert thermique se fait…`,v?'de l’extérieur vers le système':'du système vers l’extérieur',[v?'du système vers l’extérieur':'de l’extérieur vers le système'],v?'Le système reçoit de l’énergie.':'Le système cède de l’énergie.')),
+...C4.map(([n,v])=>()=>mc(`Lors de ${n}, l’énergie Q échangée par l’espèce vérifie…`,v?'Q > 0 (énergie reçue)':'Q < 0 (énergie cédée)',[v?'Q < 0 (énergie cédée)':'Q > 0 (énergie reçue)'],v?'Q > 0 : le système reçoit de l’énergie.':'Q < 0 : le système cède de l’énergie.')),
+...SC.map(([t,v,x])=>()=>mc(t+' Cette transformation est…',v?EN:EX,[v?EX:EN],x+(v?' Elle est endothermique.':' Elle est exothermique.')))];
+L[3].gen=()=>pick('t4',T4,5);
+
+/* Niveau 5 : calculs aléatoires (valeurs différentes à chaque tentative) */
+const FU=[["glace",334,"faire fondre"],["aluminium solide",397,"faire fondre"],["eau liquide",2260,"vaporiser"],["éthanol liquide",846,"vaporiser"]];
+L[4].gen=()=>{let [n,l,v]=A(FU),m=A([.1,.2,.25,.3,.5,.8,1.5,2]),a=m*l,o=[],Lg=`On donne L = `;
+o.push({q:`Quelle énergie (en kJ) faut-il pour ${v} ${fm(m)} kg de ${n} (déjà à la température de changement d’état) ? ${Lg}${l} kJ·kg⁻¹.`,a,u:'kJ',h:'Q = m × L.',e:`Q = ${fm(m)} × ${l} = ${fm(a)} kJ.`});
+[n,l,v]=A(FU);m=A([20,40,50,75,120,250,400]);a=m/1000*l;
+o.push({q:`Quelle énergie (en kJ) faut-il pour ${v} ${m} g de ${n} (déjà à la température de changement d’état) ? ${Lg}${l} kJ·kg⁻¹.`,a,u:'kJ',h:'Convertis la masse en kg avant de calculer.',e:`Q = ${fm(m/1000)} × ${l} = ${fm(a)} kJ.`});
+[n,l,v]=A(FU);const g=A([100,200,250,400,500,800]),Q=+(g/1000*l).toPrecision(3);a=Q/l*1000;
+o.push({q:`Un transfert de ${fm(Q)} kJ permet de ${v} une masse m de ${n} (déjà à la température de changement d’état). Calcule m (en g). ${Lg}${l} kJ·kg⁻¹.`,a,u:'g',h:'Isole m : m = Q / L, puis convertis en g.',e:`m = ${fm(Q)} / ${l} = ${fm(Q/l)} kg = ${fm(a)} g.`});
+const [t,l2]=A([["de vapeur d’eau se liquéfient",2260],["d’eau liquide se solidifient",334],["de vapeur d’éthanol se liquéfient",846]]);m=A([10,25,50,200,500]);a=-m/1000*l2;
+o.push({q:`${m} g ${t}. Quelle énergie Q est échangée (en kJ, avec son signe) ? Valeur absolue de L : ${l2} kJ·kg⁻¹.`,a,u:'kJ',h:'Le système cède de l’énergie : le signe est négatif.',e:`Q = −${fm(m/1000)} × ${l2} = ${fm(a)} kJ.`});
+[n,l]=A(FU.slice(0,2));m=A([.5,1,1.5,2]);const P=A([300,500,800,1000]);a=m*l*1000/P;
+o.push({q:`<b>Mission finale.</b> Un bloc de ${n} de ${fm(m)} kg, déjà à sa température de fusion, est fondu par un chauffage de puissance ${P} W. Toute l’énergie est transférée au bloc. Quelle durée (en s) faut-il ? ${Lg}${l} kJ·kg⁻¹.`,a,u:'s',h:'1) Q en J (1 kJ = 1 000 J). 2) E = P × Δt donc Δt = Q / P.',e:`Q = ${fm(m)} × ${l} 000 = ${fm(m*l*1000)} J ; Δt = Q / P = ${fm(a)} s.`});
+return o};
+
+/* affichage et progression */
+function qh(q,i,j){const b=q.o?q.o.map((o,k)=>`<button class="btn o" onclick="qcm(${i},${j},${k},this)">${o}</button>`).join(''):`<input type="text" id="in${i}_${j}" inputmode="decimal" placeholder="ta réponse"> ${q.u} <button class="btn p" id="bt${i}_${j}" onclick="num(${i},${j})">Valider</button><details><summary>Un indice ?</summary><span class="mut">${q.h}</span></details>`;
+return `<div class="q"><p>${j+1}. ${q.q}</p>${q.f?'<div class="fig">'+q.f+'</div>':''}${b}<div class="fb" id="f${i}_${j}"></div></div>`}
+function newRound(i){const s=st[i];s.rd++;s.qs=L[i].gen();s.an=s.qs.map(()=>null);$('#qz'+i).innerHTML=s.qs.map((q,j)=>qh(q,i,j)).join('');$('#rs'+i).innerHTML='';$('#rd'+i).textContent='· tentative '+s.rd}
+function retry(i){newRound(i);$('#qz'+i).scrollIntoView({behavior:'smooth'})}
+function qcm(i,j,k,el){const s=st[i],q=s.qs[j];if(s.an[j]!==null)return;el.parentNode.querySelectorAll('.o').forEach((b,x)=>{b.disabled=true;if(x===q.a)b.classList.add('ok')});if(k!==q.a)el.classList.add('ko');fin(i,j,k===q.a,q.e)}
+function num(i,j){const s=st[i],q=s.qs[j];if(s.an[j]!==null)return;const e=$('#in'+i+'_'+j),v=parseFloat(e.value.replace(/\s/g,'').replace(',','.').replace('−','-'));if(isNaN(v)){e.focus();return}
+e.disabled=true;$('#bt'+i+'_'+j).disabled=true;fin(i,j,Math.abs(v-q.a)<=Math.abs(q.a)*.015,q.e)}
+function fin(i,j,ok,t){const s=st[i],f=$('#f'+i+'_'+j);s.an[j]=ok;f.className='fb '+(ok?'ok':'ko');f.innerHTML=(ok?'✅ Bravo ! ':'❌ Réponse verrouillée. ')+t;if(s.an.every(x=>x!==null))endRound(i);upd()}
+function endRound(i){const n=st[i].qs.length,g=st[i].an.filter(Boolean).length,r=$('#rs'+i);
+if(g===n){passed[i]=true;try{localStorage.setItem('mpn',JSON.stringify(passed))}catch(e){}
+r.innerHTML=`<div class="res okk"><b>🎉 Niveau réussi : ${g}/${n} !</b> ${i<4?`<button class="btn p" onclick="go(${i+1})">Passer au niveau suivant →</button>`:'<b>Mission accomplie, bravo !</b>'}</div>`}
+else r.innerHTML=`<div class="res koo"><b>Score : ${g}/${n}.</b> Il faut 100 % pour passer au niveau suivant. Relis le cours, puis recommence avec de nouvelles questions.<br><button class="btn p" onclick="retry(${i})">🔄 Recommencer avec d’autres questions</button></div>`}
+function go(i){if(i>0&&!passed[i-1])return;L.forEach((_,k)=>{$('#s'+k).hidden=k!==i;$('#n'+k).classList.toggle('on',k===i)});if(i===1)anim();scrollTo(0,0)}
+function upd(){const p=passed.filter(Boolean).length;L.forEach((_,i)=>{const b=$('#n'+i);b.disabled=i>0&&!passed[i-1];b.classList.toggle('done',passed[i]);b.textContent=(b.disabled?'🔒 ':'')+(i+1)});
+$('#pg').style.width=(p*20)+'%';$('#pgt').textContent=p+' / 5 niveaux réussis';
+$('#badges').innerHTML=passed.map((x,i)=>x?`<span class="badge">🏅 ${L[i].t.split(' · ')[1]}</span>`:'').join('')+(p===5?'<p><b>🎉 Mission accomplie ! Tu maîtrises les changements d’état.</b></p>':'')}
+function build(){$('#nav').innerHTML=L.map((l,i)=>`<button id="n${i}" onclick="go(${i})"></button>`).join('');
+$('#lv').innerHTML=L.map((l,i)=>`<section class="card" id="s${i}" hidden><h2>${l.t}</h2><p class="mut">${l.mi}</p><div class="cours">${l.cours}</div><h3>Questionnaire <span class="mut" id="rd${i}"></span></h3><div id="qz${i}"></div><div id="rs${i}"></div></section>`).join('');
+L.forEach((_,i)=>passed[i]?$('#rs'+i).innerHTML=`<div class="res okk">✅ Niveau déjà réussi. <button class="btn" onclick="retry(${i})">S’entraîner avec de nouvelles questions</button></div>`:newRound(i));
+go(0);upd()}
+/* ===== banques étendues (10 questions par mission) ===== */
+const CDI=["augmente fortement","diminue fortement","reste à peu près la même"],CDE=["augmente","diminue","ne change pas"];
+P2.push(
+...[["la fusion",2],["la solidification",2],["la vaporisation",0],["la liquéfaction",1],["la sublimation",0],["la condensation solide",1]].map(([n,k])=>()=>mc(`Lors de ${n}, la distance moyenne entre molécules…`,CDI[k],CDI.filter((_,x)=>x!==k),'La distance ne change fortement que lorsqu’un gaz est impliqué.')),
+...[["la fusion",0],["la solidification",1],["la vaporisation",0],["la liquéfaction",1],["la sublimation",0],["la condensation solide",1]].map(([n,k])=>()=>mc(`Lors de ${n}, le désordre des molécules…`,CDE[k],CDE.filter((_,x)=>x!==k),'Le désordre augmente vers le gaz et diminue vers le solide.')),
+()=>mc('Pourquoi un gaz occupe-t-il tout le volume disponible ?','Ses molécules sont éloignées et se déplacent librement',['Ses molécules sont immobiles','Ses molécules sont attirées par les parois'],'Les interactions y sont négligeables.'),
+()=>mc('Pourquoi un liquide prend-il la forme de son récipient ?','Ses molécules glissent les unes sur les autres',['Ses molécules sont ordonnées','Ses molécules sont très éloignées'],'Elles sont proches, désordonnées et mobiles.'),
+()=>mc('Pourquoi un solide garde-t-il sa forme ?','Ses molécules restent à des positions régulières, maintenues par les interactions',['Ses molécules sont éloignées','Ses molécules glissent librement'],'Les interactions maintiennent l’ordre.'),
+()=>mc('Pourquoi la température reste-t-elle constante pendant un changement d’état d’un corps pur ?','L’énergie reçue sert à vaincre les interactions entre molécules',['L’énergie reçue est stockée dans le récipient','Le thermomètre est déréglé'],'Elle ne sert plus à augmenter l’agitation.'),
+()=>mc('Lors d’un changement d’état, la masse de l’espèce…','se conserve',['augmente','diminue'],'Aucune matière n’est créée ni perdue.'),
+()=>mc('Classe les états par interactions croissantes entre molécules :','gaz < liquide < solide',['solide < liquide < gaz','liquide < gaz < solide','gaz < solide < liquide'],'Plus les molécules sont proches, plus l’attraction est forte.'),
+()=>mc('Comment appelle-t-on les faibles attractions entre molécules voisines ?','Interactions de Van der Waals',['Liaisons covalentes','Forces nucléaires','Interactions gravitationnelles'],'Elles assurent la cohésion des liquides et des solides.'),
+()=>mc('Qu’est-ce qui reste inchangé lors d’un changement d’état ?','La nature des molécules (l’espèce chimique)',['L’ordre des molécules','La distance entre molécules','Les interactions entre molécules'],'Seuls l’organisation et les interactions changent.'));
+L[1].gen=()=>pick('p2',P2,10);
+DS.push(...[["NaOH","Na⁺(aq) + HO⁻(aq)"],["KNO₃","K⁺(aq) + NO₃⁻(aq)"],["MgCl₂","Mg²⁺(aq) + 2 Cl⁻(aq)"]].map(([f,r])=>()=>mc(`Quelle équation modélise la dissolution de ${f}(s) dans l’eau ?`,`${f}(s) → ${r}`,[`${f}(s) → ${f}(ℓ)`,`${r} → ${f}(s)`,`${f}(s) → ${f}(g)`],'Dans une dissolution, l’espèce se disperse dans l’eau : elle est notée (aq).')));
+L[2].gen=()=>{const e=pick('eq',EQ,6),f=pick('fd',FD,2),d=pick('ds',DS,2);return[e[0],e[1],f[0],e[2],e[3],d[0],e[4],f[1],e[5],d[1]]};
+T4.push(...C4.map(([n,v])=>()=>mc(`Lors de ${n}, le milieu extérieur…`,v?'se refroidit':'se réchauffe',[v?'se réchauffe':'se refroidit'],v?'Il cède de l’énergie au système.':'Il reçoit de l’énergie du système.')),
+...[["Une crème glacée fond dans ta main.",1],["Après la douche, les gouttes d’eau sur le carrelage disparaissent.",1],["Du gel se forme sur le pare-brise par nuit froide.",0],["De la vapeur se condense sur le couvercle d’une casserole.",0],["De la glace pilée refroidit une boisson.",1],["Un étang gèle en hiver.",0],["La lave se solidifie en refroidissant.",0],["Un fer à souder fait fondre l’étain.",1],["De la brume se forme au-dessus d’un lac.",0],["Un bloc de naphtaline se sublime dans une armoire.",1]].map(([t,v])=>()=>mc(t+' Cette transformation est…',v?EN:EX,[v?EX:EN],v?'Elle reçoit de l’énergie : endothermique.':'Elle cède de l’énergie : exothermique.')));
+L[3].gen=()=>pick('t4',T4,10);
+FU.push(["or solide",64,"faire fondre"],["mercure liquide",295,"vaporiser"]);
+const Lg='On donne L = ';
+const K={kg(){const [n,l,v]=A(FU),m=A([.1,.2,.25,.3,.5,.8,1.5,2]),a=m*l;return{q:`Quelle énergie (en kJ) faut-il pour ${v} ${fm(m)} kg de ${n} (déjà à la température de changement d’état) ? ${Lg}${l} kJ·kg⁻¹.`,a,u:'kJ',h:'Q = m × L.',e:`Q = ${fm(m)} × ${l} = ${fm(a)} kJ.`}},
+g(){const [n,l,v]=A(FU),m=A([20,40,50,75,120,250,400]),a=m/1000*l;return{q:`Quelle énergie (en kJ) faut-il pour ${v} ${m} g de ${n} (déjà à la température de changement d’état) ? ${Lg}${l} kJ·kg⁻¹.`,a,u:'kJ',h:'Convertis la masse en kg avant de calculer.',e:`Q = ${fm(m/1000)} × ${l} = ${fm(a)} kJ.`}},
+inv(){const [n,l,v]=A(FU),Q=+(A([100,200,250,400,500,800])/1000*l).toPrecision(3),a=Q/l*1000;return{q:`Un transfert de ${fm(Q)} kJ permet de ${v} une masse m de ${n} (déjà à la température de changement d’état). Calcule m (en g). ${Lg}${l} kJ·kg⁻¹.`,a,u:'g',h:'Isole m : m = Q / L, puis convertis en g.',e:`m = ${fm(Q)} / ${l} = ${fm(Q/l)} kg = ${fm(a)} g.`}},
+sg(){const [t,l]=A([["de vapeur d’eau se liquéfient",2260],["d’eau liquide se solidifient",334],["de vapeur d’éthanol se liquéfient",846],["de vapeur de mercure se liquéfient",295]]),m=A([10,25,50,200,500]),a=-m/1000*l;return{q:`${m} g ${t}. Quelle énergie Q est échangée (en kJ, avec son signe) ? Valeur absolue de L : ${l} kJ·kg⁻¹.`,a,u:'kJ',h:'Le système cède de l’énergie : le signe est négatif.',e:`Q = −${fm(m/1000)} × ${l} = ${fm(a)} kJ.`}},
+tm(f){const [n,l]=A(FU.filter(x=>x[2]==='faire fondre')),m=A([.5,1,1.5,2]),P=A([300,500,800,1000]),a=m*l*1000/P;return{q:`${f?'<b>Mission finale.</b> ':''}Un bloc de ${n} de ${fm(m)} kg, déjà à sa température de fusion, est fondu par un chauffage de puissance ${P} W. Toute l’énergie est transférée au bloc. Quelle durée (en s) faut-il ? ${Lg}${l} kJ·kg⁻¹.`,a,u:'s',h:'1) Q en J (1 kJ = 1 000 J). 2) E = P × Δt donc Δt = Q / P.',e:`Q = ${fm(m)} × ${l} 000 = ${fm(m*l*1000)} J ; Δt = Q / P = ${fm(a)} s.`}}};
+L[4].gen=()=>[K.kg(),K.kg(),K.g(),K.g(),K.inv(),K.inv(),K.sg(),K.sg(),K.tm(),K.tm(1)];
+
+/* ===== progression : seuil 90 %, étoiles, statistiques, bilan par mail ===== */
+const SS=L.map(()=>({a:0,ok:0,tot:0,best:0}));
+try{const o=JSON.parse(localStorage.getItem('mpn2')||'{}');passed=L.map((_,i)=>!!(o.p&&o.p[i]));(o.s||[]).forEach((x,i)=>{if(SS[i]&&x)Object.assign(SS[i],x)})}catch(e){}
+const save=()=>{try{localStorage.setItem('mpn2',JSON.stringify({p:passed,s:SS}))}catch(e){}};
+function fin(i,j,ok,t){const s=st[i],f=$('#f'+i+'_'+j);s.an[j]=ok;SS[i].tot++;if(ok)SS[i].ok++;save();f.className='fb '+(ok?'ok':'ko');f.innerHTML=(ok?'✅ Bravo ! ':'❌ Réponse verrouillée. ')+t;if(s.an.every(x=>x!==null))endRound(i);upd()}
+function endRound(i){const n=st[i].qs.length,g=st[i].an.filter(Boolean).length,r=$('#rs'+i);SS[i].a++;SS[i].best=Math.max(SS[i].best,g);
+if(g>=Math.ceil(n*.9)){passed[i]=true;r.innerHTML=`<div class="res okk"><b>🎉 Mission réussie : ${g}/${n} ! ⭐ étoile gagnée.</b> ${i<4?`<button class="btn p" onclick="go(${i+1})">Passer à la mission suivante →</button>`:'<b>Dernière mission réussie ! Descends en bas de la page pour envoyer ton bilan.</b>'}</div>`}
+else r.innerHTML=`<div class="res koo"><b>Score : ${g}/${n}.</b> Il faut au moins ${Math.ceil(n*.9)}/${n} (90 %) pour réussir la mission. Relis le cours, puis recommence avec de nouvelles questions.<br><button class="btn p" onclick="retry(${i})">🔄 Recommencer avec d’autres questions</button></div>`;save()}
+function upd(){const p=passed.filter(Boolean).length;
+L.forEach((_,i)=>{const b=$('#n'+i);b.disabled=i>0&&!passed[i-1];b.classList.toggle('done',passed[i]);b.textContent=(b.disabled?'🔒 ':'')+'Mission '+(i+1)});
+$('#stars').innerHTML='★'.repeat(p)+'<span class="off">'+'★'.repeat(5-p)+'</span> <small>'+p+'/5 étoiles</small>';
+$('#pg').style.width=(p*20)+'%';$('#pgt').textContent=p+' / 5 missions réussies';
+$('#badges').innerHTML=passed.map((x,i)=>x?`<span class="badge">🏅 ${L[i].t.split(' · ')[1]}</span>`:'').join('');
+const T=SS.reduce((a,x)=>a+x.tot,0),O=SS.reduce((a,x)=>a+x.ok,0);$('#end').hidden=p<5;$('#gpct').textContent=O+' réponses justes sur '+T+' ('+(T?Math.round(100*O/T):0)+' %)'}
+function sendMail(){const p=$('#fp').value.trim(),n=$('#fn').value.trim(),c=$('#fc').value.trim(),m=$('#mailmsg');
+if(!p||!n||!c){m.textContent='⚠️ Complète ton prénom, ton nom et ta classe.';return}
+const T=SS.reduce((a,x)=>a+x.tot,0),O=SS.reduce((a,x)=>a+x.ok,0),pc=T?Math.round(100*O/T):0;
+const body=`Bonjour,\n\nÉlève : ${p} ${n}\nClasse : ${c}\nMission Pôle Nord : les changements d’état\n\nRéponses justes (toutes tentatives, réponses verrouillées) : ${O}/${T} = ${pc} %\nMissions réussies : ${passed.filter(Boolean).length}/5\n\n`+L.map((l,i)=>`${l.t} : ${SS[i].a} tentative(s), meilleur score ${SS[i].best}/10, ${SS[i].tot?Math.round(100*SS[i].ok/SS[i].tot):0} % de réponses justes`).join('\n')+'\n',
+sub=`Bilan Mission Pôle Nord : ${p} ${n} (${c}) : ${pc} %`,t=$('#mailtxt');
+t.hidden=false;t.value='À : l.penin@csndnevers.net\nObjet : '+sub+'\n\n'+body;
+m.innerHTML='Ton application mail devrait s’ouvrir avec le message prêt. Appuie sur « Envoyer » dans ton application. Sinon, copie le texte ci-dessous et envoie-le à <b>l.penin@csndnevers.net</b>.';
+window.open('mailto:l.penin@csndnevers.net?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body),'_blank')}
+
+/* simulation */
+let M=0,P=[],raf;
+function setM(m){M=m}
+function anim(){const c=$('#cv'),x=c.getContext('2d');if(!P.length)for(let k=0;k<30;k++){const gx=k%6,gy=Math.floor(k/6);P.push({hx:90+gx*40,hy:30+gy*30,x:90+gx*40,y:30+gy*30,vx:Math.random()-.5,vy:Math.random()-.5})}
+ cancelAnimationFrame(raf);
+ (function f(){if($('#s1').hidden)return;x.clearRect(0,0,420,200);const ac=getComputedStyle(document.body).getPropertyValue('--ac')||'#1c78d4';
+ if($('#vdw').checked){x.strokeStyle=ac;x.lineWidth=2;for(let a=0;a<P.length;a++)for(let b=a+1;b<P.length;b++){const d=Math.hypot(P[a].x-P[b].x,P[a].y-P[b].y);if(d<56){x.globalAlpha=1-d/56;x.beginPath();x.moveTo(P[a].x,P[a].y);x.lineTo(P[b].x,P[b].y);x.stroke()}}x.globalAlpha=1}
+ x.fillStyle=ac;
+ P.forEach(p=>{if(M===0){p.x=p.hx+Math.sin(Date.now()/90+p.hx)*2;p.y=p.hy+Math.cos(Date.now()/80+p.hy)*2}
+ else{const s=M===1?1.2:4,top=M===1?70:8;p.vx+=(Math.random()-.5)*.6;p.vy+=(Math.random()-.5)*.6;const n=Math.hypot(p.vx,p.vy)||1;p.vx*=s/n;p.vy*=s/n;
+ p.x+=p.vx;p.y+=p.vy;if(p.x<8||p.x>412)p.vx*=-1;if(p.y<top||p.y>192)p.vy*=-1;p.x=Math.min(412,Math.max(8,p.x));p.y=Math.min(192,Math.max(top,p.y))}
+ x.beginPath();x.arc(p.x,p.y,7,0,7);x.fill()});raf=requestAnimationFrame(f)})()}
+(()=>{const s=$('#snow');for(let k=0;k<30;k++){const e=document.createElement('i');e.textContent='❄';e.style.cssText=`left:${Math.random()*100}%;font-size:${8+Math.random()*14}px;opacity:${.3+Math.random()*.5};animation-duration:${8+Math.random()*12}s;animation-delay:-${Math.random()*15}s`;s.appendChild(e)}})();
+build();
+</script>
+</body>
+</html>
