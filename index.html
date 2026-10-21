@@ -299,7 +299,8 @@ const body=`Bonjour,\n\nÉlève : ${p} ${n}\nClasse : ${c}\nMission Pôle Nord :
 sub=`Bilan Mission Pôle Nord : ${p} ${n} (${c}) : ${pc} %`,t=$('#mailtxt');
 t.hidden=false;t.value='À : l.penin@csndnevers.net\nObjet : '+sub+'\n\n'+body;
 m.innerHTML='Ton application mail devrait s’ouvrir. Appuie sur « Envoyer ». Sinon, copie le texte ci-dessous et envoie-le à <b>l.penin@csndnevers.net</b>.';
-//window.open('mailto:l.penin@csndnevers.net?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body),'_blank')}
+//window.open('mailto:l.penin@csndnevers.net?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body),'_blank')
+}
 
 /* simulation */
 let M=0,P=[],raf;
